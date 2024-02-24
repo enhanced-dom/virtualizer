@@ -1,0 +1,40 @@
+{
+  "name": "@enhanced-dom/virtualizer",
+  "version": "0.1.0",
+  "description": "Helpers for item list virtualization in 1d or 2d",
+  "repository": "https://github.com/enhanced-dom/virtualizer.git",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "@enhanced-dom-husky",
+    "package": "cd dist && npm pack",
+    "prebuild": "rimraf dist/*",
+    "build": "tsc -p ./tsconfig.json",
+    "postbuild": "copyfiles LICENSE.md README.md dist && @enhanced-dom-copy-packagejson",
+    "publish": "npm run build",
+    "test": "jest --config test/jest.config.js",
+    "lint": "eslint --fix --config eslint.config.js src demo",
+    "demo": "webpack serve --config ./demo/webpack.config.js",
+    "docs": "webpack build --config ./demo/webpack.config.js --mode=production"
+  },
+  "keywords": [],
+  "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@enhanced-dom/build": "^0.1.0",
+    "@enhanced-dom/jest": "^0.1.0",
+    "@enhanced-dom/lint": "^0.1.4",
+    "@enhanced-dom/react": "^0.1.0",
+    "@enhanced-dom/webpack": "^0.1.0",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^17.0.75",
+    "@types/react-dom": "^17.0.25",
+    "typescript": "^5.3.3",
+    "lodash.debounce": "^4.0.8",
+    "use-lodash-debounce": "^1.3.0"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=10"
+  }
+}

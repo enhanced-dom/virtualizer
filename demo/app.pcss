@@ -1,0 +1,37 @@
+/* stylelint-disable unit-allowed-list */
+.container {
+  height: 200px;
+  width: 500px;
+}
+
+.wrapper {
+  border: 2px dashed black;
+  padding: 8px;
+  height: 100%;
+}
+
+.scroll-wrapper {
+  overflow: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.scroll-canvas {
+  height: 100%;
+  min-width: 100%;
+  position: relative;
+
+  > * {
+    height: 100%;
+  }
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  background-color: white;
+  border: 1px solid black;
+  max-height: calc(100% - 2px);
+}
