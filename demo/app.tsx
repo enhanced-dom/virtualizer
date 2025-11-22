@@ -44,7 +44,7 @@ const App = () => {
     (e: React.UIEvent<HTMLDivElement>) => {
       const scrollValue = e.currentTarget.scrollLeft
       setScollDebounced(scrollValue)
-      stylesheetsRepository.setProperty(styles._stylesheetName, styles.scrollWrapper, '--current-scroll', `${scrollValue}px`)
+      stylesheetsRepository.setProperty('demo-styles', `.${styles.scrollWrapper}`, '--current-scroll', `${scrollValue}px`)
     },
     [setScollDebounced],
   )
