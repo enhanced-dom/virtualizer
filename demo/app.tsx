@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef, useMemo, useEffect } from 'react'
 import { StylesheetsRepository } from '@enhanced-dom/css'
-import { useDebouncedCallback } from 'use-lodash-debounce'
+import { useDebouncedCallback } from '@enhanced-dom/react'
 
 import * as styles from './app.pcss'
 import { IVirtualizerEntry, virtualize } from '../src'

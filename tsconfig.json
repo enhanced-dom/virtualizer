@@ -3,15 +3,16 @@
     "moduleResolution": "node",
     "module": "esnext",
     "target": "es2018",
-    "baseUrl": "./",
     "declaration": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
+    "rootDir": "./src",
     "outDir": "dist",
     "preserveConstEnums": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": false
+    "inlineSourceMap": true,
+    "inlineSources": true
   },
   "include": ["src/**/*.ts"]
 }

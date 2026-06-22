@@ -1,3 +1,4 @@
+/* global expect, test, describe */
 import { type IVirtualizerEntry, virtualize } from '../src'
 
 describe('virtualizer', () => {

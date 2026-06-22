@@ -30,7 +30,7 @@ interface ITreePart {
 class StickyGroupNode implements ITreePart {
   public id: string | number
   public level: number
-  public parent?: StickyGroupNode | StickyGroupForest = null
+  public parent?: StickyGroupNode | StickyGroupForest | null = null
   public children: StickyGroupNode[] = []
   public type = TreePartType.NODE
   static isInstance(treePart?: ITreePart): treePart is StickyGroupNode {
@@ -47,14 +47,14 @@ class StickyGroupNode implements ITreePart {
     return child
   }
 
-  public getAncestor(level: number) {
+  public getAncestor(level: number): StickyGroupNode | null | undefined {
     if (this.level > level) {
       return this
     }
     return this.parent?.getAncestor(level)
   }
 
-  public findNode(id: string | number) {
+  public findNode(id: string | number): ITreePart | null | undefined {
     if (this.id == id) {
       return this
     }
@@ -75,19 +75,19 @@ class StickyGroupNode implements ITreePart {
     return !!this.children.length
   }
 
-  private _size?: number = null
-  public get size(): number {
+  private _size?: number = undefined
+  public get size(): number | undefined {
     if (this._size == null) {
-      this._size = this.hasChildren() ? Math.max(...this.children.map((c) => c.size)) + 1 : 0
+      this._size = this.hasChildren() ? Math.max(...this.children.map((c) => c.size).filter((v) => v != null)) + 1 : 0
     }
 
     return this._size
   }
 
-  private _depth?: number = null
-  public get depth(): number {
+  private _depth?: number | undefined = undefined
+  public get depth(): number | undefined {
     if (this._depth == null) {
-      this._depth = this.parent.depth + 1
+      this._depth = (this.parent.depth ?? 0) + 1
     }
 
     return this._depth
@@ -110,13 +110,13 @@ class StickyGroupForest implements ITreePart {
     return null
   }
 
-  private _size?: number = null
-  public size(id?: string | number): number {
+  private _size?: number = undefined
+  public size(id?: string | number): number | undefined {
     if (id != null) {
       return this.findNode(id)?.size
     }
     if (this._size == null) {
-      this._size = this.hasChildren() ? Math.max(...this.children.map((c) => c.size)) + 1 : 0
+      this._size = this.hasChildren() ? Math.max(...this.children.map((c) => c.size).filter((v) => v != null)) + 1 : 0
     }
 
     return this._size
@@ -126,8 +126,8 @@ class StickyGroupForest implements ITreePart {
     return 0
   }
 
-  public findNode(id: string | number): StickyGroupNode | null {
-    return this.children.map((c) => c.findNode(id)).find((n) => !!n)
+  public findNode(id: string | number): StickyGroupNode | undefined {
+    return this.children.map((c) => c.findNode(id)).find((n) => !!n) as StickyGroupNode | undefined
   }
 
   public findAncestors(id: string | number) {
@@ -166,13 +166,13 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
   const entriesOffsets: { id: string | number; offset: number; size: number }[] = []
   const stickyGroups = new StickyGroupForest()
   const entryById: Record<string, IVirtualizerEntry> = {}
-  let currentStickyGroupNode: StickyGroupNode = null
+  let currentStickyGroupNode: StickyGroupNode | null = null
   let minimumExplicitWeight = Infinity
   let minimumDerivedWeight = Infinity
   for (const e of entries) {
     const entryMinSize = e.fixedSize ?? e.minSize
     entriesOffsets.push({ id: e.id, offset: lowerBoundSize, size: entryMinSize })
-    lowerBoundSize += entryMinSize
+    lowerBoundSize += entryMinSize ?? 0
     entryById[e.id] = e
     if (e.level != null) {
       currentStickyGroupNode =
@@ -193,8 +193,8 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
         minimumExplicitWeight = e.weight
       }
       // TODO: we assume that the input is 'sane', and maxSize > minSize if given
-      if (e.maxSize && e.maxSize - e.minSize < minimumDerivedWeight) {
-        minimumDerivedWeight = e.maxSize - e.minSize
+      if (e.maxSize && e.maxSize - (e.minSize ?? 0) < minimumDerivedWeight) {
+        minimumDerivedWeight = e.maxSize - (e.minSize ?? 0)
       }
     }
   }
@@ -221,10 +221,10 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
           if (remainingSpaceToDistribute > 0) {
             const entryWeight = e.weight ?? minimumExplicitWeight
             let entryExtraSpace = Math.min(remainingSpaceToDistribute, Math.max(Math.round(entryWeight * unitOfSpace), 1))
-            computedSize = e.minSize + entryExtraSpace
+            computedSize = (e.minSize ?? 0) + entryExtraSpace
             if (e.maxSize && computedSize > e.maxSize) {
               computedSize = e.maxSize
-              entryExtraSpace = e.maxSize - e.minSize
+              entryExtraSpace = e.maxSize - (e.minSize ?? 0)
             }
             remainingSpaceToDistribute -= entryExtraSpace
           }
@@ -248,7 +248,7 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
 
     // we attempt to distribute the remaining space based on the maxSize - minSize
     const totalDerivedWeights = entriesWithDynamicSpace.reduce((acc, e) => {
-      return acc + (e.maxSize ? e.maxSize - e.minSize : minimumDerivedWeight)
+      return acc + (e.maxSize ? e.maxSize - (e.minSize ?? 0) : minimumDerivedWeight)
     }, 0)
     if (minimumDerivedWeight) {
       const unitOfSpace = totalSpaceToDistribute / totalDerivedWeights
@@ -258,12 +258,12 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
         if (transformedEntry.size == null) {
           let computedSize = e.minSize
           if (remainingSpaceToDistribute > 0) {
-            const entryWeight = e.maxSize ? e.maxSize - e.minSize : minimumDerivedWeight
+            const entryWeight = e.maxSize ? e.maxSize - (e.minSize ?? 0) : minimumDerivedWeight
             let entryExtraSpace = Math.min(remainingSpaceToDistribute, Math.max(Math.round(entryWeight * unitOfSpace), 1))
-            computedSize = e.minSize + entryExtraSpace
+            computedSize = (e.minSize ?? 0) + entryExtraSpace
             if (e.maxSize && computedSize > e.maxSize) {
               computedSize = e.maxSize
-              entryExtraSpace = e.maxSize - e.minSize
+              entryExtraSpace = e.maxSize - (e.minSize ?? 0)
             }
             remainingSpaceToDistribute -= entryExtraSpace
           }
@@ -321,7 +321,7 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
       if (e.level) {
         const entryGroupNode = stickyGroups.findNode(e.id)
         const nextSiblingGroupNode = entryGroupNode.findNextSibling()
-        e.maxOffset = nextSiblingGroupNode ? entryOffsetById[nextSiblingGroupNode.id].start - e.size : null
+        e.maxOffset = nextSiblingGroupNode ? entryOffsetById[nextSiblingGroupNode.id].start - e.size : undefined
         e.minOffset = e.offset
       }
     })
@@ -359,7 +359,7 @@ export const virtualize = (config: IVirtualizerConfig, entries: IVirtualizerEntr
     const relativeOffsets: Record<string, number> = {}
     transformedEntries
       .filter((te) => !!te.level)
-      .sort((e1, e2) => e2.level - e1.level)
+      .sort((e1, e2) => (e2.level ?? 0) - (e1.level ?? 0))
       .forEach((te) => {
         const stickyGroupNode = stickyGroups.findNode(te.id)
         const nextSiblingGroupNode = stickyGroupNode.findNextSibling()
