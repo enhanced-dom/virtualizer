@@ -1,5 +1,5 @@
 /* global expect, test, describe */
-import { type IVirtualizerEntry, virtualize } from '../src'
+import { type IVirtualizerEntry, virtualize, createCachedVirtualizer } from '../src'
 
 describe('virtualizer', () => {
   test('auto-virtualizes elements to stretch to the view', () => {
@@ -10,25 +10,25 @@ describe('virtualizer', () => {
       { id: 1, level: 1, minSize: 10 },
       { id: 2, minSize: 20 },
     ]
-    let totalFixedSize = entries.reduce((acc, e) => acc + e.minSize, 0)
+    let totalFixedSize = entries.reduce((acc, e) => acc + e.minSize!, 0)
     let results = virtualize({ viewportSize }, entries)
     expect(results.length).toEqual(entries.length)
-    expect(results[0].id).toEqual(entries[0].id)
-    expect(results[0].size).toEqual(entries[0].minSize + (viewportSize - totalFixedSize) / 2)
-    expect(results[1].id).toEqual(entries[1].id)
-    expect(results[1].size).toEqual(entries[1].minSize + (viewportSize - totalFixedSize) / 2)
+    expect(results[0]!.id).toEqual(entries[0]!.id)
+    expect(results[0]!.size).toEqual(entries[0]!.minSize! + (viewportSize - totalFixedSize) / 2)
+    expect(results[1]!.id).toEqual(entries[1]!.id)
+    expect(results[1]!.size).toEqual(entries[1]!.minSize! + (viewportSize - totalFixedSize) / 2)
 
     // some fixed sizes, no weights, no max sizes, should distribute all remaining space to items without fixed size
     entries = [
       { id: 1, level: 1, minSize: 10, fixedSize: 8 },
       { id: 2, minSize: 20 },
     ]
-    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize), 0)
+    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize)!, 0)
     results = virtualize({ viewportSize }, entries)
-    expect(results[0].id).toEqual(entries[0].id)
-    expect(results[0].size).toEqual(entries[0].fixedSize)
-    expect(results[1].id).toEqual(entries[1].id)
-    expect(results[1].size).toEqual(entries[1].minSize + viewportSize - totalFixedSize)
+    expect(results[0]!.id).toEqual(entries[0]!.id)
+    expect(results[0]!.size).toEqual(entries[0]!.fixedSize)
+    expect(results[1]!.id).toEqual(entries[1]!.id)
+    expect(results[1]!.size).toEqual(entries[1]!.minSize! + viewportSize - totalFixedSize)
 
     // only fixed sizes, should NOT distribute any remaining space
     entries = [
@@ -36,14 +36,14 @@ describe('virtualizer', () => {
       { id: 2, minSize: 20, fixedSize: 42 },
       { id: 3, maxSize: 20, fixedSize: 10 },
     ]
-    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize), 0)
+    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize)!, 0)
     results = virtualize({ viewportSize }, entries)
-    expect(results[0].id).toEqual(entries[0].id)
-    expect(results[0].size).toEqual(entries[0].fixedSize)
-    expect(results[1].id).toEqual(entries[1].id)
-    expect(results[1].size).toEqual(entries[1].fixedSize)
-    expect(results[2].id).toEqual(entries[2].id)
-    expect(results[2].size).toEqual(entries[2].fixedSize)
+    expect(results[0]!.id).toEqual(entries[0]!.id)
+    expect(results[0]!.size).toEqual(entries[0]!.fixedSize)
+    expect(results[1]!.id).toEqual(entries[1]!.id)
+    expect(results[1]!.size).toEqual(entries[1]!.fixedSize)
+    expect(results[2]!.id).toEqual(entries[2]!.id)
+    expect(results[2]!.size).toEqual(entries[2]!.fixedSize)
 
     // some fixed sizes, some maxSizes, some weights, should distribute respecting the weights and maxSize and consider minweight where missing weight
     entries = [
@@ -52,16 +52,16 @@ describe('virtualizer', () => {
       { id: 3, maxSize: 20, minSize: 10 },
       { id: 4, weight: 5, minSize: 10 },
     ]
-    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize), 0)
+    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize)!, 0)
     results = virtualize({ viewportSize }, entries)
-    expect(results[0].id).toEqual(entries[0].id)
-    expect(results[0].size).toEqual(entries[0].fixedSize)
-    expect(results[1].id).toEqual(entries[1].id)
-    expect(results[1].size).toEqual(32)
-    expect(results[2].id).toEqual(entries[2].id)
-    expect(results[2].size).toEqual(entries[2].maxSize)
-    expect(results[3].id).toEqual(entries[3].id)
-    expect(results[3].size).toEqual(38)
+    expect(results[0]!.id).toEqual(entries[0]!.id)
+    expect(results[0]!.size).toEqual(entries[0]!.fixedSize)
+    expect(results[1]!.id).toEqual(entries[1]!.id)
+    expect(results[1]!.size).toEqual(32)
+    expect(results[2]!.id).toEqual(entries[2]!.id)
+    expect(results[2]!.size).toEqual(entries[2]!.maxSize)
+    expect(results[3]!.id).toEqual(entries[3]!.id)
+    expect(results[3]!.size).toEqual(38)
 
     // some fixed sizes, some maxSizes, no weights, should distribute respecting the maxSize-minSize, and consider minsizedelta were missing maxSize
     entries = [
@@ -70,16 +70,16 @@ describe('virtualizer', () => {
       { id: 3, minSize: 10 },
       { id: 4, minSize: 10, maxSize: 50 },
     ]
-    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize), 0)
+    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize)!, 0)
     results = virtualize({ viewportSize }, entries)
-    expect(results[0].id).toEqual(entries[0].id)
-    expect(results[0].size).toEqual(entries[0].fixedSize)
-    expect(results[1].id).toEqual(entries[1].id)
-    expect(results[1].size).toEqual(entries[1].maxSize)
-    expect(results[2].id).toEqual(entries[2].id)
-    expect(results[2].size).toEqual(17)
-    expect(results[3].id).toEqual(entries[3].id)
-    expect(results[3].size).toEqual(entries[3].maxSize)
+    expect(results[0]!.id).toEqual(entries[0]!.id)
+    expect(results[0]!.size).toEqual(entries[0]!.fixedSize)
+    expect(results[1]!.id).toEqual(entries[1]!.id)
+    expect(results[1]!.size).toEqual(entries[1]!.maxSize)
+    expect(results[2]!.id).toEqual(entries[2]!.id)
+    expect(results[2]!.size).toEqual(17)
+    expect(results[3]!.id).toEqual(entries[3]!.id)
+    expect(results[3]!.size).toEqual(entries[3]!.maxSize)
 
     // some fixed sizes, some maxSizes, one weight, should ensure all outstanding space is distributed to unbounded items
     entries = [
@@ -88,16 +88,16 @@ describe('virtualizer', () => {
       { id: 3, minSize: 5, maxSize: 15, weight: 1 },
       { id: 4, minSize: 5 },
     ]
-    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize), 0)
+    totalFixedSize = entries.reduce((acc, e) => acc + (e.fixedSize ?? e.minSize)!, 0)
     results = virtualize({ viewportSize }, entries)
-    expect(results[0].id).toEqual(entries[0].id)
-    expect(results[0].size).toEqual(entries[0].maxSize)
-    expect(results[1].id).toEqual(entries[1].id)
-    expect(results[1].size).toEqual(46)
-    expect(results[2].id).toEqual(entries[2].id)
-    expect(results[2].size).toEqual(entries[2].maxSize)
-    expect(results[3].id).toEqual(entries[3].id)
-    expect(results[3].size).toEqual(29)
+    expect(results[0]!.id).toEqual(entries[0]!.id)
+    expect(results[0]!.size).toEqual(entries[0]!.maxSize)
+    expect(results[1]!.id).toEqual(entries[1]!.id)
+    expect(results[1]!.size).toEqual(46)
+    expect(results[2]!.id).toEqual(entries[2]!.id)
+    expect(results[2]!.size).toEqual(entries[2]!.maxSize)
+    expect(results[3]!.id).toEqual(entries[3]!.id)
+    expect(results[3]!.size).toEqual(29)
     expect(results.reduce((acc, r) => acc + r.size, 0)).toEqual(viewportSize)
   })
 
@@ -131,14 +131,14 @@ describe('virtualizer', () => {
     // viewport starts in the middle of an item
     let results = virtualize({ viewportSize, offset: 55, overscan: 2 }, entries)
     expect(results.length).toEqual(15)
-    expect(results[0].id).toEqual(4)
-    expect(results[results.length - 1].id).toEqual(18)
+    expect(results[0]!.id).toEqual(4)
+    expect(results[results.length - 1]!.id).toEqual(18)
 
     // not enough items to overscan
     results = virtualize({ viewportSize, offset: 10, overscan: 2 }, entries)
     expect(results.length).toEqual(13)
-    expect(results[0].id).toEqual(1)
-    expect(results[results.length - 1].id).toEqual(13)
+    expect(results[0]!.id).toEqual(1)
+    expect(results[results.length - 1]!.id).toEqual(13)
 
     // offset is somehow larger than the total size of the elements...
     results = virtualize({ viewportSize, offset: 300, overscan: 2 }, entries)
@@ -149,7 +149,7 @@ describe('virtualizer', () => {
     // offset allows only 1 element. barely
     results = virtualize({ viewportSize, offset: 205, overscan: 2 }, entries)
     expect(results.length).toEqual(3)
-    expect(results[0].id).toEqual(19)
+    expect(results[0]!.id).toEqual(19)
   })
 
   test('account for sticky elements during the virtualization', () => {
@@ -186,5 +186,70 @@ describe('virtualizer', () => {
     results = virtualize({ viewportSize: 50, offset: 110, overscan: 1 }, entries)
     expect(results.length).toEqual(11)
     expect(results.map((r) => r.id)).toEqual([1, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17])
+  })
+
+  test('virtualize stays fast with 10000 entries', () => {
+    const entries: IVirtualizerEntry[] = Array.from({ length: 10000 }, (_, k) => k).map((id) => ({
+      id,
+      ...(id % 100 === 0 ? { minSize: 30, maxSize: 60 } : { fixedSize: 40 }),
+      level: id % 31 === 0 ? 3 : (id - 1) % 19 === 0 ? 2 : (id - 2) % 7 === 0 ? 1 : undefined,
+    }))
+
+    const timeIt = (label: string, config: Parameters<typeof virtualize>[0], iterations = 50) => {
+      for (let i = 0; i < 5; i++) virtualize(config, entries) // warmup
+      const start = performance.now()
+      for (let i = 0; i < iterations; i++) virtualize(config, entries)
+      const avgMs = (performance.now() - start) / iterations
+
+      console.log(`[perf] ${label}: ${avgMs.toFixed(3)}ms/call (avg of ${iterations})`)
+      return avgMs
+    }
+
+    const midScroll = timeIt('windowed, mid-scroll', { viewportSize: 1200, offset: 200000, overscan: 30 })
+    const start = timeIt('windowed, start of list', { viewportSize: 1200, offset: 0, overscan: 30 })
+    const allFit = timeIt('all entries fit viewport', { viewportSize: 10000 * 40 + 1000, overscan: 30 })
+
+    // loose regression guard, not a strict perf budget
+    expect(midScroll).toBeLessThan(50)
+    expect(start).toBeLessThan(50)
+    expect(allFit).toBeLessThan(50)
+  })
+
+  test('createCachedVirtualizer is faster than virtualize when scrolling after an initial render', () => {
+    const entries: IVirtualizerEntry[] = Array.from({ length: 10000 }, (_, k) => k).map((id) => ({
+      id,
+      ...(id % 100 === 0 ? { minSize: 30, maxSize: 60 } : { fixedSize: 40 }),
+      level: id % 31 === 0 ? 3 : (id - 1) % 19 === 0 ? 2 : (id - 2) % 7 === 0 ? 1 : undefined,
+    }))
+    const viewportConfig = { viewportSize: 1200, overscan: 30 }
+    const middleOffset = 200000
+    const iterations = 200
+
+    for (let i = 0; i < 5; i++) virtualize({ ...viewportConfig, offset: middleOffset }, entries) // warmup
+    const plainStart = performance.now()
+    for (let i = 0; i < iterations; i++) virtualize({ ...viewportConfig, offset: middleOffset }, entries)
+    const plainAvgMs = (performance.now() - plainStart) / iterations
+
+    for (let i = 0; i < 5; i++) {
+      const warmupVirtualizer = createCachedVirtualizer()
+      warmupVirtualizer({ ...viewportConfig, offset: 0 }, entries)
+      warmupVirtualizer({ ...viewportConfig, offset: middleOffset }, entries)
+    } // warmup
+    let cachedTotalMs = 0
+    for (let i = 0; i < iterations; i++) {
+      const cachedVirtualizer = createCachedVirtualizer()
+      cachedVirtualizer({ ...viewportConfig, offset: 0 }, entries)
+      const start = performance.now()
+      cachedVirtualizer({ ...viewportConfig, offset: middleOffset }, entries)
+      cachedTotalMs += performance.now() - start
+    }
+    const cachedAvgMs = cachedTotalMs / iterations
+
+    console.log(`[perf] plain virtualize (scroll to middle): ${plainAvgMs.toFixed(4)}ms/call`)
+    console.log(`[perf] cached virtualizer (scroll to middle, after offset=0): ${cachedAvgMs.toFixed(4)}ms/call`)
+    console.log(`[perf] speedup: ${(plainAvgMs / cachedAvgMs).toFixed(2)}x`)
+
+    // loose regression guard: caching the complete entry mapping must speed up subsequent scroll calls
+    expect(cachedAvgMs).toBeLessThan(plainAvgMs)
   })
 })

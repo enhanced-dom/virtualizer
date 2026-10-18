@@ -3,3 +3,17 @@ node_modules/
 .vscode/
 .DS_Store
 npm-debug.log*
+.venv
+# Added by code-review-graph
+.code-review-graph/
+# @enhanced-dom/lint
+.fallowrc.json
+.npmrc
+.nvmrc
+# end @enhanced-dom/lint
+.claude
+.devcontainer
+.rtk
+CLAUDE.md
+.vscode
+.mcp.json

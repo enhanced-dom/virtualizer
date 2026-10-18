@@ -1,38 +1,40 @@
 {
   "name": "@enhanced-dom/virtualizer",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Helpers for item list virtualization in 1d or 2d",
   "repository": "https://github.com/enhanced-dom/virtualizer.git",
+  "type":"module",
   "main": "index.js",
   "scripts": {
-    "postinstall": "@enhanced-dom-husky",
+    "configure-claude": "@enhanced-dom-claude --configs react code agent rtk devcontainer caveman-lite",
+    "configure-lint": "@enhanced-dom-fallow --gitignore && @enhanced-dom-npmrc --gitignore && @enhanced-dom-nvmrc --gitignore && @enhanced-dom-husky --gitignore",
+    "configure-build": "@enhanced-dom-bootstrap-tsconfig",
+    "prepare": "npm run configure-lint && npm run configure-claude && npm run configure-build",
     "package": "cd dist && npm pack",
     "prebuild": "rimraf dist/*",
     "build": "tsc -p ./tsconfig.json",
-    "postbuild": "copyfiles LICENSE.md README.md dist && @enhanced-dom-copy-packagejson",
-    "publish": "npm run build",
-    "test": "jest --config test/jest.config.cjs",
-    "lint": "eslint --fix --config eslint.config.cjs src demo",
-    "demo": "webpack serve --config ./demo/webpack.config.cjs",
-    "docs": "webpack build --config ./demo/webpack.config.cjs --mode=production"
+    "typecheck": "tsc -p ./tsconfig.json --noEmit",
+    "postbuild": "tsc-esm-fix --target=dist && copyfiles LICENSE.md README.md dist && @enhanced-dom-copy-packagejson",
+    "test": "jest --config test/jest.config.mjs",
+    "lint": "eslint --fix --config eslint.config.mjs src demo test",
+    "demo": "webpack serve --config ./demo/webpack.config.mjs",
+    "docs": "webpack build --config ./demo/webpack.config.mjs --mode=production",
+    "docs:analyze": "webpack build --config ./demo/webpack.config.mjs --mode=production --env analyze"
   },
   "keywords": [],
   "author": "CD9B4A105290E17E0948E021DF4105107C88693C59C0B891CCC08366C51AEA990902A6A156AC87D88A2FC41422A5E1C3C4071F251F19441C4516000EC25F87DF",
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "@enhanced-dom/build": "^0.2.0",
-    "@enhanced-dom/jest": "^0.2.1",
-    "@enhanced-dom/lint": "^0.3.0",
-    "@enhanced-dom/react": "^0.3.1",
-    "@enhanced-dom/webpack": "^0.4.0",
-    "@types/jest": "^30.0.0",
-    "@types/react": "^18.3.31",
-    "@types/react-dom": "^18.3.7",
-    "typescript": "^5.9.3"
+    "@enhanced-dom/babel": "^0.3.0",
+    "@enhanced-dom/claude": "^0.3.1",
+    "@enhanced-dom/jest": "^0.3.0",
+    "@enhanced-dom/lint": "^0.4.2",
+    "@enhanced-dom/react": "^0.4.0",
+    "@enhanced-dom/webpack": "^0.5.1"
   },
   "engines": {
-    "node": ">=20",
-    "npm": ">=10"
+    "node": ">=22.23.2",
+    "npm": ">=12"
   }
 }

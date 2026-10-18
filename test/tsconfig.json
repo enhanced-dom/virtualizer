@@ -1,13 +1,9 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2018",
     "allowJs": true,
-    "sourceMap": true,
-    "jsx": "react",
-    "rootDir": ".."
-
+    "rootDir": "..",
+    "types": ["jest"]
   },
   "include": [
     "./**/*.ts",

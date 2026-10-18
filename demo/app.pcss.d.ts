@@ -1,4 +1,5 @@
 export const container: string;
+export const controls: string;
 export const scrollCanvas: string;
 export const scrollWrapper: string;
 export const tile: string;

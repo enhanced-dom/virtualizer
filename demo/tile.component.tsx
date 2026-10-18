@@ -1,17 +1,12 @@
 import { type PropsWithChildren, type CSSProperties, useMemo } from 'react'
 
-import { IVirtualizerResult } from '../src'
+import { IVirtualizerResultFlat, IVirtualizerResultLevel } from '../src'
 import * as styles from './app.pcss'
 
-const Tile = ({
-  level,
-  size,
-  minOffset,
-  maxOffset,
-  relativeOffset,
-  offset,
-  children,
-}: PropsWithChildren<Omit<IVirtualizerResult, 'id'>>) => {
+type TileProps = Pick<IVirtualizerResultFlat, 'size' | 'offset'> &
+  Partial<Pick<IVirtualizerResultLevel, 'level' | 'minOffset' | 'maxOffset' | 'levelOffset'>>
+
+const Tile = ({ level, size, minOffset, maxOffset, levelOffset: relativeOffset, offset, children }: PropsWithChildren<TileProps>) => {
   const tileStyle = useMemo(() => {
     const style: CSSProperties = {
       zIndex: level,

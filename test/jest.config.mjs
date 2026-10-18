@@ -1,7 +1,11 @@
-const path = require('path')
-const jestConfigFactory = require('@enhanced-dom/jest').jestConfigFactory
+import path from 'path'
+import { fileURLToPath } from 'url'
+import { jestConfigFactory } from '@enhanced-dom/jest'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const baseConfig = jestConfigFactory({ ts: true, processorConfigPath: path.join(__dirname, 'tsconfig.json') })
-module.exports = {
+
+export default {
   ...baseConfig,
   transformIgnorePatterns: ['node_modules/(?!@enhanced-dom/|lodash-es)'],
 }
